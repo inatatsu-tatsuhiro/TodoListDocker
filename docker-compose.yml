@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+    react:
+        container_name: react
+        build: ./docker/react
+        command: yarn start
+        volumes:
+            - ./web:/app
+        ports:
+            - 3000:3000
+
+    server:
+        container_name: server
+        build: ./docker/go
+        command: realize start --server
+        volumes:
+            - ./golang:/app
+        ports:
+            - 8000:8000
+            - 5002:5002
+
+    db:
+        container_name: mysql
+        image: mysql:5.7
+        environment:
+            MYSQL_ROOT_PASSWORD: docker
+        ports:
+            - 3306:3306
+        volumes:
+            - ./db:/var/lib/mysql
+
+    test:
+        container_name: test
+        image: nginx
+        ports: 
+            - 8080:80
+        volumes: 
+            - ./docker/nginx/test/:/etc/nginx/conf.d/
+        depends_on: 
+            - react
+
+    nginx:
+        container_name: nginx
+        image: nginx
+        ports: 
+            - 80:80
+        volumes: 
+            - ./web/build:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        depends_on: 
+            - react
+

@@ -1,0 +1,1 @@
+npm init -y && npm i react react-router create-react-app
